@@ -60,4 +60,10 @@ export class CadastroComponent implements OnInit{
 
   }
 
+  limparDados(form: any){
+    form.reset();
+    this.cliente = new Cliente();
+    this.atualizando = false;
+  }
+
 }
