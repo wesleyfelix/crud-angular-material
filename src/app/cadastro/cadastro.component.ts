@@ -7,12 +7,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import { MatSnackBar } from '@angular/material/snack-bar'
+import {MatSelectChange, MatSelectModule} from '@angular/material/select'
 import { Cliente} from './cliente'
 import { ClienteService} from '../cliente.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgxMaskDirective, provideNgxMask} from 'ngx-mask';
 import {BrasilapiService} from '../brasilapi.service';
 import {Estado, Municipio} from '../brasilapi.models';
+import {CommonModule} from '@angular/common';
 
 
 @Component({
@@ -25,7 +27,9 @@ import {Estado, Municipio} from '../brasilapi.models';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    NgxMaskDirective
+    NgxMaskDirective,
+    MatSelectModule,
+    CommonModule
   ],
   providers: [provideNgxMask()],
   templateUrl: './cadastro.component.html',
@@ -53,6 +57,10 @@ export class CadastroComponent implements OnInit{
         if(clienteEncontrado){
           this.atualizando = true;
           this.cliente = clienteEncontrado;
+          if(this.cliente.uf){
+            const event = { value: this.cliente.uf };
+            this.carregarMunicipios(event as MatSelectChange)
+          }
         }
       }
     });
@@ -61,11 +69,19 @@ export class CadastroComponent implements OnInit{
 
   carregarUFs(){
     this.brasilApiService.listarUFs().subscribe({
-      next: listaEstados => console.log("lista estados", listaEstados),
+      next: listaEstados => this.estados = listaEstados,
       error: error => console.log(error)
     });
-    console.log("passou aqui")
   }
+
+  carregarMunicipios(event: MatSelectChange){
+    const ufSelecionada = event.value;
+    this.brasilApiService.listarMunicipios(ufSelecionada).subscribe({
+      next: listaMunicipios => this.municipios = listaMunicipios,
+      error: error => console.log(error)
+    });
+  }
+
 
   salvar(){
     if(!this.atualizando){
